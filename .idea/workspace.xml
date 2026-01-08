@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86a1e993-a663-4e73-9395-277582c389ce" name="Changes" comment="model weights added" />
+    <list default="true" id="86a1e993-a663-4e73-9395-277582c389ce" name="Changes" comment="shifted rewards incentives and removed replay function for now">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PacmanRL.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/PacmanRL.ipynb" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -82,7 +85,7 @@
       <workItem from="1767622087031" duration="21907000" />
       <workItem from="1767841830061" duration="16764000" />
       <workItem from="1767879780082" duration="199000" />
-      <workItem from="1767879987441" duration="1390000" />
+      <workItem from="1767879987441" duration="3813000" />
     </task>
     <task id="LOCAL-00001" summary="init files">
       <option name="closed" value="true" />
@@ -100,7 +103,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767882157201</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="shifted rewards incentives and removed replay function for now">
+      <option name="closed" value="true" />
+      <created>1767884602119</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1767884602119</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -120,6 +131,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init files" />
     <MESSAGE value="model weights added" />
-    <option name="LAST_COMMIT_MESSAGE" value="model weights added" />
+    <MESSAGE value="shifted rewards incentives and removed replay function for now" />
+    <option name="LAST_COMMIT_MESSAGE" value="shifted rewards incentives and removed replay function for now" />
   </component>
 </project>
