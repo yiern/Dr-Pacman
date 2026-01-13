@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="86a1e993-a663-4e73-9395-277582c389ce" name="Changes" comment="change from replay buffer from a simple deque to PrioritizedReplayBuffer to prioritize important experience">
+    <list default="true" id="86a1e993-a663-4e73-9395-277582c389ce" name="Changes" comment="fixed replaybuffer error when sampling and type errors when retrieving samples.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacmanRL.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/PacmanRL.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +84,7 @@
       <workItem from="1767622087031" duration="21907000" />
       <workItem from="1767841830061" duration="16764000" />
       <workItem from="1767879780082" duration="199000" />
-      <workItem from="1767879987441" duration="11842000" />
+      <workItem from="1767879987441" duration="13266000" />
     </task>
     <task id="LOCAL-00001" summary="init files">
       <option name="closed" value="true" />
@@ -119,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767886823659</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fixed replaybuffer error when sampling and type errors when retrieving samples.">
+      <option name="closed" value="true" />
+      <created>1767935316007</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1767935316007</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -141,6 +148,7 @@
     <MESSAGE value="model weights added" />
     <MESSAGE value="shifted rewards incentives and removed replay function for now" />
     <MESSAGE value="change from replay buffer from a simple deque to PrioritizedReplayBuffer to prioritize important experience" />
-    <option name="LAST_COMMIT_MESSAGE" value="change from replay buffer from a simple deque to PrioritizedReplayBuffer to prioritize important experience" />
+    <MESSAGE value="fixed replaybuffer error when sampling and type errors when retrieving samples." />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed replaybuffer error when sampling and type errors when retrieving samples." />
   </component>
 </project>
