@@ -1,56 +1,64 @@
-# Pac-Man APEX Project
+# Dr. Pac-Man: Deep Q-Learning Agent
 
 ## Overview
-This repository implements Asynchronous Prioritized Experience Replay (APEX) for training and evaluating a Pac-Man agent in the Atari gym environment using PyTorch.
+This repository implements a Deep Q-Network (DQN) agent for playing Atari Pac-Man using PyTorch. Features include Dueling DQN architecture, Prioritized Experience Replay, custom reward shaping, and automatic checkpoint discovery for seamless training resumption.
 
-## Prerequisites
-- Python 3.9+
-- PyTorch (CPU or GPU)
-- Git
-- System dependencies for ALE (e.g., libsdl2-dev on Linux, Homebrew packages on macOS)
-
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yiern/Dr-Pacman.git
-   cd Dr-Pacman
-   ```
-2. Activate the existing virtual environment:
-   ```bash
-   source .venv/bin/activate  # macOS/Linux
-   .\\.venv\\Scripts\\activate  # Windows
-   ```
-3. Install required Python packages using the environment's pip:
-   ```bash
-   .venv/bin/pip install torch gymnasium ale-py jsonwebtoken
-   ```
+## Key Features
+- **Dueling DQN Architecture**: Separate value and advantage streams for better Q-value estimation
+- **Prioritized Experience Replay**: Learn from important experiences more frequently
+- **Custom Reward Shaping**: Balanced rewards for pellets, ghosts, and survival
+- **Automatic Checkpoint Discovery**: Seamlessly resume training without manual configuration
+- **Apple Silicon Support**: Full MPS (Metal Performance Shaders) support for M1/M2/M3 Macs
+- **Comprehensive Evaluation Tools**: Compare models, watch gameplay, analyze metrics
 
 ## Running Training
-The training script `train_apex.py` trains the agent using multiple parallel actors.
+The training script `train_single.py` trains the agent using single-process DQN with automatic checkpoint discovery.
 
 ```bash
-python train_apex.py
+python train_single.py
 ```
 
-### Common arguments
-| Argument | Description | Default |
+### Training Modes
+```python
+# Auto-resume (default - finds best checkpoint automatically)
+train_single_process(episodes=1000)
+
+# Force fresh start (ignore existing checkpoints)
+train_single_process(episodes=1000, checkpoint=False)
+
+# Load specific checkpoint
+train_single_process(episodes=1000, checkpoint="saved_models/dqn_episode_500.pth")
+```
+
+### Configuration Parameters
+Edit `train_single.py` to customize:
+| Parameter | Description | Default |
 |----------|-------------|---------|
-| `--num_actors` | Number of parallel actors | 4 |
-| `--episodes_per_actor` | Episodes per actor | 500 |
-| `--frameskip` | Number of frames to skip per action | 4 |
-| `--save_dir` | Directory to save checkpoints | saved_models |
-| `--checkpoint_every` | Save checkpoint every N experiences | 10000 |
+| `episodes` | Number of episodes to train | 1000 |
+| `frameskip` | Frames to skip per action | 4 |
+| `save_dir` | Checkpoint directory | saved_models |
+| `save_every` | Save checkpoint every N episodes | 100 |
+| `checkpoint` | Checkpoint path or mode | None (auto) |
 
 #### Example: Quick test run
-```bash
-python train_apex.py --num_actors 2 --episodes_per_actor 10 --save_dir saved_models_test
+```python
+# In train_single.py main() function
+train_single_process(
+    episodes=10,
+    save_every=5,
+    print_every=1
+)
 ```
 
 ## Running Evaluation
 After training, evaluate the model with `evaluate_agent.py`.
 
 ```bash
-python evaluate_agent.py --model saved_models/apex_final.pth --episodes 10
+# Evaluate final model (headless)
+python evaluate_agent.py --model saved_models/dqn_final.pth --episodes 10
+
+# Watch the agent play with rendering
+python evaluate_agent.py --model saved_models/dqn_final.pth --episodes 5 --render
 ```
 
 ### Additional options
@@ -58,18 +66,37 @@ python evaluate_agent.py --model saved_models/apex_final.pth --episodes 10
 - `--compare MODEL1 MODEL2`: Compare multiple checkpoints.
 - `--epsilon VALUE`: Set exploration rate (default 0.01).
 
-#### Example: Compare two checkpoints
+#### Example: Compare checkpoints
 ```bash
-python evaluate_agent.py --model saved_models/apex_checkpoint_10000.pth --compare saved_models/apex_checkpoint_50000.pth saved_models/apex_final.pth
+python evaluate_agent.py --model saved_models/dqn_episode_500.pth --compare saved_models/dqn_episode_1000.pth saved_models/dqn_final.pth
+```
+
+#### Quick playback utility
+```python
+# Simple script to watch agent play
+python -c "from play_agent import PlayAgent; PlayAgent().play('saved_models/dqn_final.pth', 3)"
+```
+
+## Project Structure
+```
+PyCharmMiscProject/
+├── train_single.py              # Main training script with auto-discovery
+├── rl_agent.py                  # DQN agent with prioritized replay
+├── dqn_networks.py              # DQN and Dueling DQN architectures
+├── pacman_reward_wrapper.py     # Custom reward shaping
+├── evaluate_agent.py            # Model evaluation and comparison
+├── play_agent.py                # Simple playback utility
+├── saved_models/                # Checkpoint directory (git-ignored)
+│   ├── dqn_final.pth           # Final trained model
+│   └── dqn_episode_*.pth       # Periodic checkpoints
+├── CLAUDE.md                    # Project instructions for Claude Code
+└── MODULES_README.md            # Detailed module documentation
 ```
 
 ## Tips & Troubleshooting
-- On macOS you may see an MPS warning; training will fall back to CPU.
-- Ensure you have run training before evaluation; the default model path expects `saved_models/apex_final.pth`.
-- Install system libraries if you encounter ALE errors:
-  - Ubuntu: `sudo apt-get install libsdl2-dev libsdl2-image-dev libopenblas-dev`
-  - macOS (Homebrew): `brew install sdl2`
-- Increase `--num_actors` or use a GPU to accelerate training.
+- **Apple Silicon Macs**: Training automatically uses MPS (Metal) for acceleration
+- **CUDA GPUs**: Automatically detected and used if available
+- **Resume Training**: Just run `python train_single.py` - it auto-resumes from best checkpoint
+- **Start Fresh**: Use `checkpoint=False` in code or delete checkpoints from `saved_models/`
+- **Checkpoint Files**: All `.pth` files are git-ignored to keep repository lightweight
 
-## License
-This project is licensed under the MIT License – see the `LICENSE` file for details.

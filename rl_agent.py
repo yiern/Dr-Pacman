@@ -250,9 +250,9 @@ class RlAgent:
         )
         self.grad_norms.append(grad_norm.item())
 
-        # Warning if gradients are exploding
-        if grad_norm > 5.0 and self.curr_step % 1000 == 0:
-            print(f"Warning: High gradient norm: {grad_norm:.2f}")
+        # Warning if gradients are exploding (rare, only print if very high)
+        if grad_norm > 10.0 and self.curr_step % 1000 == 0:
+            print(f"Warn: grad_norm={grad_norm:.2f}")
 
         self.optimizer.step()
 
@@ -290,7 +290,6 @@ class RlAgent:
             save_dict['metadata'] = metadata
 
         torch.save(save_dict, filepath)
-        print(f"Model saved: {filepath}")
 
     def load_model(self, filepath, load_optimizer=True):
         """
@@ -303,7 +302,7 @@ class RlAgent:
         Returns:
             dict: Checkpoint dictionary with metadata
         """
-        checkpoint = torch.load(filepath, map_location=self.device)
+        checkpoint = torch.load(filepath, map_location=self.device, weights_only=False)
 
         self.policy_net.load_state_dict(checkpoint['model_state_dict'])
         self.target_net.load_state_dict(checkpoint['target_state_dict'])
@@ -317,5 +316,4 @@ class RlAgent:
         if 'curr_step' in checkpoint:
             self.curr_step = checkpoint['curr_step']
 
-        print(f"Model loaded: {filepath}")
         return checkpoint

@@ -42,3 +42,8 @@ package-lock.json
 # Training outputs
 *.png
 training_metrics/
+
+# AI assistant files
+CLAUDE.md
+.claude/
+.opencode/

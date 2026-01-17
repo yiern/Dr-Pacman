@@ -88,18 +88,7 @@ def train_single_process(
                    - str: Explicit path to specific checkpoint
                    - False: Force fresh start (skip auto-discovery)
     """
-    print("=" * 80)
-    print("🎮 SINGLE PROCESS DQN TRAINING")
-    print("=" * 80)
-    print(f"Configuration:")
-    print(f"  Episodes: {episodes}")
-    print(f"  Frameskip: {frameskip}")
-    print(f"  Save directory: {save_dir}")
-    if checkpoint:
-        print(f"  Checkpoint: {checkpoint}")
-        print(f"  Resume mode: ENABLED")
-    print("=" * 80)
-    print()
+    print(f"Training: {episodes} episodes | frameskip={frameskip} | save_dir={save_dir}")
 
     # Setup environment
     gym.register_envs(ale_py)
@@ -113,74 +102,30 @@ def train_single_process(
     input_dim = env.observation_space.shape
     output_dim = env.action_space.n
 
-    print(f"Environment setup:")
-    print(f"  Input dimensions: {input_dim}")
-    print(f"  Number of actions: {output_dim}")
-    print()
-
     # Create agent
     agent = RlAgent(input_dim, output_dim, save_dir=save_dir, use_dueling=True)
-    print(f"Agent initialized on device: {agent.device}")
-    print(f"  Architecture: {'Dueling DQN' if agent.use_dueling else 'DQN'}")
-    print(f"  Exploration rate: {agent.exploration_rate:.3f} -> {agent.exploration_min:.3f}")
-    print(f"  Burnin: {int(agent.burnin)} steps")
-    print()
+    print(f"Agent: {'Dueling DQN' if agent.use_dueling else 'DQN'} on {agent.device} | ε: {agent.exploration_rate:.3f}→{agent.exploration_min:.3f} | burnin: {int(agent.burnin)}")
 
     # Auto-discover checkpoint if not explicitly provided
     if checkpoint is None:
         auto_checkpoint = find_latest_checkpoint(save_dir)
         if auto_checkpoint:
             checkpoint = auto_checkpoint
-            print("=" * 80)
-            print("🔍 AUTO-DISCOVERY: Found existing checkpoint")
-            print("=" * 80)
-            print(f"  ✓ Auto-selected: {checkpoint}")
-            print("  ℹ To start fresh, delete checkpoints or use checkpoint=False")
-            print("=" * 80)
-            print()
+            print(f"Auto-discovered checkpoint: {checkpoint}")
 
     # Load checkpoint if provided (manual or auto-discovered)
     # Skip if checkpoint=False (explicit fresh start)
     if checkpoint and checkpoint is not False:
-        print("=" * 80)
-        print("📦 Loading checkpoint for continued training...")
-        print("=" * 80)
-
         import os
         if not os.path.exists(checkpoint):
             raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
 
-        try:
-            # Load using agent's method - returns checkpoint dictionary
-            checkpoint_data = agent.load_model(checkpoint, load_optimizer=True)
+        checkpoint_data = agent.load_model(checkpoint, load_optimizer=True)
 
-            # Display what was loaded from checkpoint
-            if 'episode' in checkpoint_data:
-                print(f"  ✓ Loaded checkpoint from episode: {checkpoint_data['episode']}")
-
-            # Display restored state
-            print(f"  ✓ Restored exploration rate: {agent.exploration_rate:.4f}")
-            print(f"  ✓ Restored curr_step: {agent.curr_step}")
-
-            # Display previous training metadata
-            if 'metadata' in checkpoint_data:
-                metadata = checkpoint_data['metadata']
-                if 'avg_reward_100' in metadata:
-                    print(f"  ✓ Previous avg reward (100 ep): {metadata['avg_reward_100']:.2f}")
-                if 'total_steps' in metadata:
-                    print(f"  ✓ Previous total steps: {metadata['total_steps']}")
-
-            print()
-            print("  ℹ Starting NEW training session from episode 1")
-            print("  ℹ Note: Replay buffer is empty and will refill during burnin")
-            print(f"  ℹ Burnin period: {int(agent.burnin)} steps")
-
-        except Exception as e:
-            print(f"  ✗ Error loading checkpoint: {e}")
-            raise
-
-        print("=" * 80)
-        print()
+        info_parts = [f"Loaded: ep={checkpoint_data.get('episode', '?')}", f"ε={agent.exploration_rate:.4f}", f"step={agent.curr_step}"]
+        if 'metadata' in checkpoint_data and 'avg_reward_100' in checkpoint_data['metadata']:
+            info_parts.append(f"prev_avg={checkpoint_data['metadata']['avg_reward_100']:.1f}")
+        print(" | ".join(info_parts))
 
     # Training metrics
     episode_rewards = []
@@ -188,8 +133,7 @@ def train_single_process(
     recent_rewards = []
     total_steps = 0
 
-    print("🚀 Starting training...")
-    print()
+    print("Starting training...")
 
     # Training loop
     for episode in range(1, episodes + 1):
@@ -268,6 +212,7 @@ def train_single_process(
                     'episode_reward': episode_reward
                 }
             )
+            print(f"  → Saved: {filepath}")
 
     # Save final model
     import os
@@ -285,15 +230,7 @@ def train_single_process(
 
     env.close()
 
-    print()
-    print("=" * 80)
-    print("✅ TRAINING COMPLETE!")
-    print("=" * 80)
-    print(f"Total steps: {total_steps}")
-    print(f"Average reward (last 100): {np.mean(recent_rewards):.1f}")
-    print(f"Best episode reward: {max(episode_rewards):.1f}")
-    print(f"Final model saved: {final_path}")
-    print()
+    print(f"\nComplete! steps={total_steps} | avg_reward={np.mean(recent_rewards):.1f} | best={max(episode_rewards):.1f} | saved: {final_path}")
 
     return episode_rewards, episode_lengths
 

@@ -37,15 +37,7 @@ def evaluate_agent(
     Returns:
         dict: Evaluation metrics (avg_reward, avg_length, best_reward, etc.)
     """
-    print("=" * 80)
-    print("🎮 EVALUATING TRAINED AGENT")
-    print("=" * 80)
-    print(f"Model: {model_path}")
-    print(f"Episodes: {num_episodes}")
-    print(f"Render: {render}")
-    print(f"Exploration rate: {exploration_rate}")
-    print("=" * 80)
-    print()
+    print(f"Evaluating: {model_path} | episodes={num_episodes} | render={render} | ε={exploration_rate}")
 
     # Setup environment
     gym.register_envs(ale_py)
@@ -66,15 +58,8 @@ def evaluate_agent(
     # Load trained model
     try:
         checkpoint = agent.load_model(model_path, load_optimizer=False)
-        print(f"✅ Model loaded successfully")
-        if 'experiences_processed' in checkpoint:
-            print(f"   Experiences processed: {checkpoint['experiences_processed']}")
-        if 'training_steps' in checkpoint:
-            print(f"   Training steps: {checkpoint['training_steps']}")
-        print()
     except FileNotFoundError:
-        print(f"❌ Error: Model not found at {model_path}")
-        print("   Make sure you've run train_apex.py first!")
+        print(f"Error: Model not found at {model_path}")
         return None
 
     # Set evaluation mode
@@ -133,16 +118,11 @@ def evaluate_agent(
     }
 
     # Print summary
-    print()
-    print("=" * 80)
-    print("📊 EVALUATION SUMMARY")
-    print("=" * 80)
-    print(f"Average Reward: {metrics['avg_reward']:.2f} ± {metrics['std_reward']:.2f}")
-    print(f"Reward Range: [{metrics['min_reward']:.1f}, {metrics['max_reward']:.1f}]")
-    print(f"Average Episode Length: {metrics['avg_length']:.1f} steps")
-    print(f"Average Game Score: {metrics['avg_score']:.1f}")
-    print(f"Best Game Score: {metrics['max_score']:.0f}")
-    print("=" * 80)
+    print(f"\nSummary: avg_reward={metrics['avg_reward']:.2f}±{metrics['std_reward']:.2f} | "
+          f"range=[{metrics['min_reward']:.1f},{metrics['max_reward']:.1f}] | "
+          f"avg_len={metrics['avg_length']:.1f} | "
+          f"avg_score={metrics['avg_score']:.1f} | "
+          f"best_score={metrics['max_score']:.0f}")
 
     return metrics
 
@@ -158,16 +138,12 @@ def compare_models(model_paths, num_episodes=10):
     Returns:
         dict: Comparison results
     """
-    print("=" * 80)
-    print("🔍 COMPARING MODELS")
-    print("=" * 80)
-    print()
+    print("Comparing models...")
 
     results = {}
 
     for model_path in model_paths:
-        print(f"\nEvaluating: {model_path}")
-        print("-" * 80)
+        print(f"\n{model_path}")
         metrics = evaluate_agent(
             model_path=model_path,
             num_episodes=num_episodes,
@@ -177,20 +153,14 @@ def compare_models(model_paths, num_episodes=10):
             results[model_path] = metrics
 
     # Print comparison table
-    print()
-    print("=" * 80)
-    print("📊 COMPARISON TABLE")
-    print("=" * 80)
-    print(f"{'Model':<40} {'Avg Reward':<15} {'Avg Score':<15}")
-    print("-" * 80)
+    print(f"\n{'Model':<40} {'Avg Reward':<15} {'Avg Score':<15}")
+    print("-" * 70)
 
     for model_path, metrics in results.items():
         model_name = model_path.split('/')[-1]  # Get filename only
         print(f"{model_name:<40} "
-              f"{metrics['avg_reward']:>7.2f} ± {metrics['std_reward']:<5.2f} "
+              f"{metrics['avg_reward']:>7.2f}±{metrics['std_reward']:<5.2f} "
               f"{metrics['avg_score']:>10.1f}")
-
-    print("=" * 80)
 
     return results
 
@@ -214,14 +184,7 @@ def watch_agent_play(
     """
     import time
 
-    print("=" * 80)
-    print("👀 WATCHING AGENT PLAY")
-    print("=" * 80)
-    print(f"Model: {model_path}")
-    print(f"Episodes: {num_episodes}")
-    print(f"Close the game window to stop early")
-    print("=" * 80)
-    print()
+    print(f"Watching agent: {model_path} | episodes={num_episodes} (close window to stop)")
 
     metrics = evaluate_agent(
         model_path=model_path,
@@ -279,7 +242,6 @@ if __name__ == '__main__':
     # Example usage:
 
     # 1. Quick evaluation (no rendering)
-    print("Running quick evaluation...")
     evaluate_agent(
         model_path="saved_models/apex_final.pth",
         num_episodes=10,
