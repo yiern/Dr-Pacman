@@ -25,7 +25,7 @@ def train_single_process(
     frameskip=4,
     save_dir="saved_models",
     save_every=100,
-    print_every=10
+    print_every=250
 ):
     """
     Train a Pac-Man agent using single-process DQN.
@@ -108,6 +108,7 @@ def train_single_process(
 
             # Learn from experience
             q_value, loss = agent.learn()
+            
             if q_value is not None:
                 episode_q_values.append(q_value)
             if loss is not None:

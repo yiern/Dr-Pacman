@@ -90,7 +90,7 @@ class RlAgent:
         self.curr_step = 0
 
         # Training parameters
-        self.burnin = 5e3  # Start learning sooner (reduced from 1e4)
+        self.burnin = 5e3  # How many steps before we start learning
         self.learn_every = 4  # Train every 4 steps
         self.sync_every = 1e4  # Sync target network every 10k steps
 
