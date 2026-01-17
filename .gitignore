@@ -25,7 +25,9 @@ env/
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Model checkpoints and logs (keep only final models)
+# Model checkpoints and logs
+saved_models/*.pth
+saved_models/dqn_*.pth
 saved_models/checkpoint_*.pth
 *.log
 
