@@ -11,18 +11,22 @@ import torch
 import numpy as np
 import gymnasium as gym
 import ale_py
-from gymnasium.wrappers import ResizeObservation, GrayscaleObservation, FrameStackObservation
+from gymnasium.wrappers import (
+    ResizeObservation,
+    GrayscaleObservation,
+    FrameStackObservation,
+)
 
 from rl_agent import RlAgent
 from pacman_reward_wrapper import PacmanRewardWrapper
 
 
 def evaluate_agent(
-    model_path="saved_models/apex_final.pth",
+    model_path="saved_models/dqn_final.pth",
     num_episodes=10,
     render=False,
     exploration_rate=0.01,  # Low epsilon for evaluation
-    frameskip=4
+    frameskip=4,
 ):
     """
     Evaluate a trained agent.
@@ -37,12 +41,14 @@ def evaluate_agent(
     Returns:
         dict: Evaluation metrics (avg_reward, avg_length, best_reward, etc.)
     """
-    print(f"Evaluating: {model_path} | episodes={num_episodes} | render={render} | ε={exploration_rate}")
+    print(
+        f"Evaluating: {model_path.split('/')[-1]} | episodes={num_episodes} | render={render} | ε={exploration_rate}"
+    )
 
     # Setup environment
     gym.register_envs(ale_py)
-    render_mode = 'human' if render else 'rgb_array'
-    env = gym.make('ALE/Pacman-v5', render_mode=render_mode, frameskip=frameskip)
+    render_mode = "human" if render else "rgb_array"
+    env = gym.make("ALE/Pacman-v5", render_mode=render_mode, frameskip=frameskip)
     env = ResizeObservation(env, (84, 84))
     env = GrayscaleObservation(env)
     env = FrameStackObservation(env, 4)
@@ -52,7 +58,7 @@ def evaluate_agent(
     agent = RlAgent(
         input_dim=env.observation_space.shape,
         output_dim=env.action_space.n,
-        use_dueling=True
+        use_dueling=True,
     )
 
     # Load trained model
@@ -88,7 +94,7 @@ def evaluate_agent(
 
             episode_reward += reward
             episode_length += 1
-            raw_score = info.get('score', 0)  # Get raw Atari score
+            raw_score = info.get("score", 0)  # Get raw Atari score
 
             state = next_state
 
@@ -99,30 +105,34 @@ def evaluate_agent(
         episode_lengths.append(episode_length)
         episode_scores.append(raw_score)
 
-        print(f"Episode {episode + 1}/{num_episodes}: "
-              f"Reward: {episode_reward:.1f}, "
-              f"Length: {episode_length}, "
-              f"Score: {raw_score}")
+        print(
+            f"Episode {episode + 1}/{num_episodes}: "
+            f"Reward: {episode_reward:.1f}, "
+            f"Length: {episode_length}, "
+            f"Score: {raw_score}"
+        )
 
     env.close()
 
     # Compute statistics
     metrics = {
-        'avg_reward': np.mean(episode_rewards),
-        'std_reward': np.std(episode_rewards),
-        'min_reward': np.min(episode_rewards),
-        'max_reward': np.max(episode_rewards),
-        'avg_length': np.mean(episode_lengths),
-        'avg_score': np.mean(episode_scores),
-        'max_score': np.max(episode_scores),
+        "avg_reward": np.mean(episode_rewards),
+        "std_reward": np.std(episode_rewards),
+        "min_reward": np.min(episode_rewards),
+        "max_reward": np.max(episode_rewards),
+        "avg_length": np.mean(episode_lengths),
+        "avg_score": np.mean(episode_scores),
+        "max_score": np.max(episode_scores),
     }
 
     # Print summary
-    print(f"\nSummary: avg_reward={metrics['avg_reward']:.2f}±{metrics['std_reward']:.2f} | "
-          f"range=[{metrics['min_reward']:.1f},{metrics['max_reward']:.1f}] | "
-          f"avg_len={metrics['avg_length']:.1f} | "
-          f"avg_score={metrics['avg_score']:.1f} | "
-          f"best_score={metrics['max_score']:.0f}")
+    print(
+        f"\nSummary: avg_reward={metrics['avg_reward']:.2f}±{metrics['std_reward']:.2f} | "
+        f"range=[{metrics['min_reward']:.1f},{metrics['max_reward']:.1f}] | "
+        f"avg_len={metrics['avg_length']:.1f} | "
+        f"avg_score={metrics['avg_score']:.1f} | "
+        f"best_score={metrics['max_score']:.0f}"
+    )
 
     return metrics
 
@@ -145,9 +155,7 @@ def compare_models(model_paths, num_episodes=10):
     for model_path in model_paths:
         print(f"\n{model_path}")
         metrics = evaluate_agent(
-            model_path=model_path,
-            num_episodes=num_episodes,
-            render=False
+            model_path=model_path, num_episodes=num_episodes, render=False
         )
         if metrics:
             results[model_path] = metrics
@@ -157,20 +165,22 @@ def compare_models(model_paths, num_episodes=10):
     print("-" * 70)
 
     for model_path, metrics in results.items():
-        model_name = model_path.split('/')[-1]  # Get filename only
-        print(f"{model_name:<40} "
-              f"{metrics['avg_reward']:>7.2f}±{metrics['std_reward']:<5.2f} "
-              f"{metrics['avg_score']:>10.1f}")
+        model_name = model_path.split("/")[-1]  # Get filename only
+        print(
+            f"{model_name:<40} "
+            f"{metrics['avg_reward']:>7.2f}±{metrics['std_reward']:<5.2f} "
+            f"{metrics['avg_score']:>10.1f}"
+        )
 
     return results
 
 
 def watch_agent_play(
-    model_path="saved_models/apex_final.pth",
+    model_path="saved_models/dqn_final.pth",
     num_episodes=5,
     exploration_rate=0.0,  # Fully greedy
     frameskip=4,
-    slow_mode=False
+    slow_mode=False,
 ):
     """
     Watch the trained agent play (with rendering).
@@ -184,14 +194,14 @@ def watch_agent_play(
     """
     import time
 
-    print(f"Watching agent: {model_path} | episodes={num_episodes} (close window to stop)")
+    print(f"Watching: {model_path.split('/')[-1]} | episodes={num_episodes}")
 
     metrics = evaluate_agent(
         model_path=model_path,
         num_episodes=num_episodes,
         render=True,
         exploration_rate=exploration_rate,
-        frameskip=frameskip
+        frameskip=frameskip,
     )
 
     if slow_mode and metrics:
@@ -204,17 +214,25 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Evaluate trained Pac-Man agent')
-    parser.add_argument('--model', type=str, default='saved_models/apex_final.pth',
-                        help='Path to model checkpoint')
-    parser.add_argument('--episodes', type=int, default=10,
-                        help='Number of episodes to evaluate')
-    parser.add_argument('--render', action='store_true',
-                        help='Render the game (watch agent play)')
-    parser.add_argument('--compare', nargs='+', type=str,
-                        help='Compare multiple models')
-    parser.add_argument('--epsilon', type=float, default=0.01,
-                        help='Exploration rate (default: 0.01)')
+    parser = argparse.ArgumentParser(description="Evaluate trained Pac-Man agent")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="saved_models/apex_final.pth",
+        help="Path to model checkpoint",
+    )
+    parser.add_argument(
+        "--episodes", type=int, default=10, help="Number of episodes to evaluate"
+    )
+    parser.add_argument(
+        "--render", action="store_true", help="Render the game (watch agent play)"
+    )
+    parser.add_argument(
+        "--compare", nargs="+", type=str, help="Compare multiple models"
+    )
+    parser.add_argument(
+        "--epsilon", type=float, default=0.01, help="Exploration rate (default: 0.01)"
+    )
 
     args = parser.parse_args()
 
@@ -226,7 +244,7 @@ def main():
         watch_agent_play(
             model_path=args.model,
             num_episodes=args.episodes,
-            exploration_rate=args.epsilon
+            exploration_rate=args.epsilon,
         )
     else:
         # Standard evaluation
@@ -234,31 +252,9 @@ def main():
             model_path=args.model,
             num_episodes=args.episodes,
             render=False,
-            exploration_rate=args.epsilon
+            exploration_rate=args.epsilon,
         )
 
 
-if __name__ == '__main__':
-    # Example usage:
-
-    # 1. Quick evaluation (no rendering)
-    evaluate_agent(
-        model_path="saved_models/apex_final.pth",
-        num_episodes=10,
-        render=False
-    )
-
-    # 2. Watch agent play (uncomment to enable)
-    # print("\nNow watching agent play...")
-    # watch_agent_play(
-    #     model_path="saved_models/apex_final.pth",
-    #     num_episodes=3,
-    #     exploration_rate=0.0  # Fully greedy
-    # )
-
-    # 3. Compare checkpoints (uncomment to enable)
-    # compare_models([
-    #     "saved_models/apex_checkpoint_10000.pth",
-    #     "saved_models/apex_checkpoint_50000.pth",
-    #     "saved_models/apex_final.pth"
-    # ], num_episodes=10)
+if __name__ == "__main__":
+    main()
