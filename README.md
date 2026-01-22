@@ -23,12 +23,24 @@ This project uses Machine Learning to beat Pac-Man. The agent learns by playing 
 - Higher Q-value = better expected long-term reward
 
 **3. Learning (Reinforcement Learning)**
-- **Positive Reward (+5)**: Eat a pellet
-- **Negative Reward (-5)**: Get killed by a ghost
-- **Positive Reward (+10-20)**: Eat a ghost (after eating power pellet)
-- **Small Penalty (-0.001)**: Doing nothing (encourages action)
+- The agent learns from a **Reward Wrapper** that modifies base game rewards:
 
-The agent starts random and slowly discovers that eating pellets and ghosts leads to higher scores while avoiding ghosts prevents negative rewards.
+| Event | Base Reward | Shaped Reward | Purpose |
+|-------|-------------|---------------|---------|
+| Eat pellet | 10 | **+5.0** | 5x boost to encourage pellet-seeking |
+| Eat power pellet | 50 | **+25.0** | Big bonus for ghost hunting |
+| Eat ghost | 200-1600 | **+100-800** | Massive reward for risky plays |
+| Death | -1 | **-5.0** | Recoverable penalty |
+| No action (idle) | 0 | **-0.001/step** | Penalty for standing still |
+
+The reward wrapper makes rewards **5x more appealing** than the original game, so eating just 1 pellet (+5) fully recovers from a death (-5). The idle penalty (-0.001/step) prevents the agent from standing still indefinitely.
+
+### Reward Philosophy
+
+- **Death is recoverable**: A single pellet (+5) offsets one death (-5)
+- **Pellets are valuable**: Encourage path efficiency and maze navigation
+- **Idle is punished**: Even -0.001/step adds up over time, pushing the agent to move
+- **Ghosts are high-risk, high-reward**: Massive points but requires positioning
 
 ## Evolution Timeline
 
