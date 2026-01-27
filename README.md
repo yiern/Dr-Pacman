@@ -72,9 +72,9 @@ flowchart LR
 
     subgraph Stage4 [Stage 4: Dueling DQN]
         direction TB
-        U1[Value Stream V(s)<br/>How good is this state?]
-        U2[Advantage Stream A(s,a)<br/>Which action is best?]
-        U3[Q = V + A - mean(A)<br/>Better estimates]
+        U1[Value Stream V(s)<br>How good is this state?]
+        U2[Advantage Stream A(s,a)<br>Which action is best?]
+        U3[Q = V + A - mean(A)<br>Better estimates]
     end
 
     Stage1 --> |"Replace table<br/>with neural net"| Stage2
